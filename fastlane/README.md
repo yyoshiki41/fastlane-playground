@@ -48,6 +48,11 @@ Bump a new version
 fastlane task bump
 ```
 Create a new pull request to bump a new version
+### task create_release_note
+```
+fastlane task create_release_note
+```
+Create a release note in draft
 
 ----
 

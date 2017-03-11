@@ -18,6 +18,7 @@ default_platform :ios
 # Custom definition variables
 xcodeproj_path = "ios/AwesomeProject.xcodeproj"
 android_proj_path = "android"
+templates_path = "fastlane/templates"
 
 
 platform :ios do
@@ -36,7 +37,6 @@ platform :task do
   repo = "yyoshiki41/fastlane-playground"
 
   desc "Bump a new version"
-  #private_lane :bump_version do |options|
   lane :bump_version do |options|
     case options[:type]
     when 'major'
@@ -55,6 +55,19 @@ platform :task do
     increment_version_name(bump_type: type)
   end
 
+  desc "Create a new pull request"
+  private_lane :create_pr do |options|
+    base = options[:base] || "develop"
+    create_pull_request(
+      repo: repo,
+      api_token: ENV["GITHUB_TOKEN"],
+      title: options[:title],
+      head: options[:head],
+      base: base,
+      body: options[:body]
+    )
+  end
+
   desc "Create a new pull request to bump a new version"
   lane :bump do |options|
     sh "git fetch"
@@ -66,7 +79,6 @@ platform :task do
     bump_version(options[:type])
     git_add(path: ['ios', 'android'])
 
-    # FIXME: android version どうするか?
     version = get_version_number(xcodeproj: xcodeproj_path)
     message = "Bump v#{version}"
     git_commit(path: ['ios', 'android'], message: message)
@@ -75,16 +87,38 @@ platform :task do
     sh "git branch -m #{head}"
 
     push_to_git_remote(local_branch: head)
-    # TODO: body
-    create_pr(head: head, title: message, body: "")
+    create_pr(
+      head: head,
+      title: message,
+      body: erb(
+        template: "#{templates_path}/bump_version.rb",
+        placeholders: {}
+      ),
+    )
 
     sh "git checkout -"
   end
 
-  desc "Create a new pull request"
-  private_lane :create_pr do |options|
-    base = options[:base] || "develop"
-    create_pull_request(api_token: ENV["GITHUB_TOKEN"], repo: repo, title: options[:title], head: options[:head], base: base, body: options[:body])
+  desc "Create a release note in draft"
+  lane :create_release_note do |options|
+    commitish = options[:commitish] || "develop"
+    version = get_version_number(xcodeproj: xcodeproj_path)
+
+    set_github_release(
+      repository_name: repo,
+      api_token: ENV["GITHUB_TOKEN"],
+      name: "v#{version}",
+      tag_name: "v#{version}",
+      is_draft: true,
+      is_prerelease: true,
+      description: erb(
+        template: "#{templates_path}/release_note.erb",
+        placeholders: {
+          :version => version
+        }
+      ),
+      commitish: commitish
+    )
   end
 
 end

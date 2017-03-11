@@ -19,8 +19,6 @@ default_platform :ios
 xcodeproj_path = "ios/AwesomeProject.xcodeproj"
 android_proj_path = "android"
 
-ENV["GITHUB_TOKEN"] = ""
-
 
 platform :ios do
   desc "Runs all the tests"
@@ -59,18 +57,25 @@ platform :task do
 
   desc "Create a new pull request to bump a new version"
   lane :bump do |options|
+    tmp_branch = "bump/tmp"
+    sh "git checkout -b #{tmp_branch}"
+
+    bump_version(options[:type])
+    git_add(path: ['ios', 'android'])
+
     # FIXME: android version どうするか?
     version = get_version_number(xcodeproj: xcodeproj_path)
-    head = "bump/#{version}"
     message = "Bump v#{version}"
+    git_commit(path: ['ios', 'android'], message: message)
 
-    sh "git checkout -b #{head}"
-    bump_version(options[:type])
-    git_add(path: [xcodeproj_path, android_proj_path])
-    git_commit(path: [xcodeproj_path, android_proj_path], message: message)
+    head = "bump/#{version}"
+    sh "git branch -m #{head}"
+
     push_to_git_remote(local_branch: head)
     # TODO: body
     create_pr(head: head, title: message, body: "")
+
+    # cleanup
     sh "git checkout -"
   end
 

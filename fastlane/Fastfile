@@ -57,6 +57,9 @@ platform :task do
 
   desc "Create a new pull request to bump a new version"
   lane :bump do |options|
+    sh "git fetch"
+    sh "git checkout develop"
+    sh "git pull origin develop"
     tmp_branch = "bump/tmp"
     sh "git checkout -b #{tmp_branch}"
 
@@ -75,7 +78,6 @@ platform :task do
     # TODO: body
     create_pr(head: head, title: message, body: "")
 
-    # cleanup
     sh "git checkout -"
   end
 

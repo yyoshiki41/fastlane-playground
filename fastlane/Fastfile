@@ -76,7 +76,7 @@ platform :task do
     tmp_branch = "bump/tmp"
     sh "git checkout -b #{tmp_branch}"
 
-    bump_version(options[:type])
+    bump_version(options)
     git_add(path: ['ios', 'android'])
 
     version = get_version_number(xcodeproj: xcodeproj_path)
@@ -93,7 +93,7 @@ platform :task do
       body: erb(
         template: "#{templates_path}/bump_version.erb",
         placeholders: {}
-      ),
+      )
     )
 
     sh "git checkout -"

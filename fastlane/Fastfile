@@ -91,7 +91,7 @@ platform :task do
       head: head,
       title: message,
       body: erb(
-        template: "#{templates_path}/bump_version.rb",
+        template: "#{templates_path}/bump_version.erb",
         placeholders: {}
       ),
     )

@@ -9,7 +9,6 @@ dependencies:
 test:
   override:
     - bundle exec fastlane list
-    - bundle exec fastlane task create_release_note
 
 deployment:
   update-dependencies:

@@ -1,0 +1,13 @@
+machine:
+  environment:
+    FL_BUILDLOG_PATH: ~/Library/Logs
+  xcode:
+    version: "8.2"
+dependencies:
+  override:
+    - bundle check || bundle install --jobs=4 --retry=3 --path .bundle
+test:
+  pre:
+    - ulimit -n 400
+  override:
+    - bundle exec fastlane list

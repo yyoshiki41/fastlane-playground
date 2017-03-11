@@ -16,9 +16,9 @@ deployment:
   update-dependencies:
     branch: develop
     commands:
+      # 直前が bump/v* からのマージコミットなら、release_note 作成
       - >
-        # 直前が bump/v* からのマージコミットなら、release_note 作成。
-        merged=$(git log -1 --oneline --abbrev-commit --merges)
-        if echo "$merged" | grep "/bump/v*" 2>&1 > /dev/null; then
+        merged=$(git log -1 --oneline --abbrev-commit --merges);
+        if echo "${merged}" | grep "/bump/v*" 2>&1 > /dev/null; then
           bundle exec fastlane task create_release_note
         fi

@@ -1,0 +1,12 @@
+# For more information about this configuration visit
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs/Appfile.md
+
+# iOS
+app_identifier "" # The bundle identifier of your app
+apple_id "" # Your Apple email address
+
+team_id "[[DEV_PORTAL_TEAM_ID]]"  # Developer Portal Team ID
+
+# Android
+json_key_file "./google-play-api-secret.json" # Path to the json secret file - Follow https://github.com/fastlane/supply#setup to get one
+package_name "com.myapp.app" # Your Android app package

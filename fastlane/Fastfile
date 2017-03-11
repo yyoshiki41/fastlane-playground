@@ -1,0 +1,83 @@
+# Customise this file, documentation can be found here:
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+# All available actions: https://docs.fastlane.tools/actions
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+# If you want to automatically update fastlane if a new version is available:
+# update_fastlane
+
+# This is the minimum version number required.
+# Update this, if you use features of a newer version
+fastlane_version "2.19.3"
+
+default_platform :ios
+
+# Custom definition variables
+xcodeproj_path = "ios/AwesomeProject.xcodeproj"
+android_proj_path = "android"
+
+ENV["GITHUB_TOKEN"] = ""
+
+
+platform :ios do
+  desc "Runs all the tests"
+  lane :test do
+    scan
+  end
+end
+
+
+platform :android do
+end
+
+
+platform :task do
+  repo = "yyoshiki41/fastlane-playground"
+
+  desc "Bump a new version"
+  #private_lane :bump_version do |options|
+  lane :bump_version do |options|
+    case options[:type]
+    when 'major'
+      type = options[:type]
+    when 'minor'
+      type = options[:type]
+    else
+      type = 'patch'
+    end
+
+    # iOS
+    increment_build_number(xcodeproj: xcodeproj_path)
+    increment_version_number(xcodeproj: xcodeproj_path, bump_type: type)
+    # Android
+    increment_version_code
+    increment_version_name(bump_type: type)
+  end
+
+  desc "Create a new pull request to bump a new version"
+  lane :bump do |options|
+    # FIXME: android version どうするか?
+    version = get_version_number(xcodeproj: xcodeproj_path)
+    head = "bump/#{version}"
+    message = "Bump v#{version}"
+
+    sh "git checkout -b #{head}"
+    bump_version(options[:type])
+    git_add(path: [xcodeproj_path, android_proj_path])
+    git_commit(path: [xcodeproj_path, android_proj_path], message: message)
+    push_to_git_remote(local_branch: head)
+    # TODO: body
+    create_pr(head: head, title: message, body: "")
+    sh "git checkout -"
+  end
+
+  desc "Create a new pull request"
+  private_lane :create_pr do |options|
+    base = options[:base] || "develop"
+    create_pull_request(api_token: ENV["GITHUB_TOKEN"], repo: repo, title: options[:title], head: options[:head], base: base, body: options[:body])
+  end
+
+end

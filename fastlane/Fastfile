@@ -35,6 +35,7 @@ end
 
 platform :task do
   repo = "yyoshiki41/fastlane-playground"
+  github_token = ENV["GITHUB_TOKEN"]
 
   desc "Bump a new version"
   lane :bump_version do |options|
@@ -60,7 +61,7 @@ platform :task do
     base = options[:base] || "develop"
     create_pull_request(
       repo: repo,
-      api_token: ENV["GITHUB_TOKEN"],
+      api_token: github_token,
       title: options[:title],
       head: options[:head],
       base: base,
@@ -106,7 +107,7 @@ platform :task do
 
     set_github_release(
       repository_name: repo,
-      api_token: ENV["GITHUB_TOKEN"],
+      api_token: github_token,
       name: "v#{version}",
       tag_name: "v#{version}",
       is_draft: true,

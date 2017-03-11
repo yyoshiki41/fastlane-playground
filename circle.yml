@@ -7,10 +7,9 @@ dependencies:
   override:
     - bundle check || bundle install --jobs=4 --retry=3 --path .bundle
 test:
-  pre:
-    - ulimit -n 400
   override:
     - bundle exec fastlane list
+    - bundle exec fastlane task create_release_note
 
 deployment:
   update-dependencies:

@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/yyoshiki41/fastlane-plugin-android_versioning.git
+  revision: 4115607a722aa50f566eccebe60816be67f8a5ff
+  specs:
+    fastlane-plugin-android_versioning (0.2.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -142,6 +148,7 @@ PLATFORMS
 
 DEPENDENCIES
   fastlane
+  fastlane-plugin-android_versioning!
 
 BUNDLED WITH
    1.14.6

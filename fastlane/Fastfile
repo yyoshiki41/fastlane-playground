@@ -103,7 +103,7 @@ platform :task do
   desc "Create a release note in draft"
   lane :create_release_note do |options|
     commitish = options[:commitish] || "develop"
-    version = get_version_number(xcodeproj: xcodeproj_path)
+    version = get_version_name
 
     set_github_release(
       repository_name: repo,
